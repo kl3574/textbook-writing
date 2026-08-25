@@ -76,9 +76,9 @@ description: "教材讲义写作。创建或修订教材类 HTML（数学/统计
 - 一次会话一章
 - **HTML 渲染与作图规范**（2026-08-25 新增）：
   - **渲染自包含**：KaTeX 完全内嵌（katex.min.js + auto-render.min.js + katex.min.css 全部 woff2 转 data URI），禁止外部 CDN/字体依赖——桌面应用预览会拦截 CDN 请求导致公式不渲染；最终 HTML 必须可离线打开（验收：除文献链接与 xmlns 声明外无 http(s) 引用）
-  - **构建链路**：bash heredoc + python raw 字符串（r'''...'''）生成 HTML，防 Write 工具反斜杠翻倍（`\(` → `\\(`）；auto-render 的 delimiters 在 JS 字面量中写 `'\\('`（源文本 2 反斜杠+括号，4 反斜杠会解析成 `\\(` 匹配失败）；数学内避免 `\\[2pt]` 行距语法（与显示公式定界符冲突）
+  - **构建链路**：bash heredoc + python raw 字符串（r'''...'''）生成 HTML，防 Write 工具反斜杠翻倍（`\(` → `\\(`）；auto-render 的 delimiters 在 JS 字面量中写 `'\\('`（源文本 2 反斜杠+括号，4 反斜杠会解析成 `\\(` 匹配失败）；数学内避免 `\\[2pt]` 行距语法（与显示公式定界符冲突）；**min.css 的 @font-face 陷阱**（2026-08-25 实战）：katex.min.css 中每个 @font-face 的 src 末尾无分号（直接 `}` 结束），删除 ttf/woff 引用必须连同 ` format("...")` 一起删且**禁止**用 `[^;]*` 跨分号匹配——否则删除范围会吞到下一个 @font-face 的 font-style 分号，级联删除使 20 个字体只剩 1 个，全部数学符号静默 fallback 系统字体显示乱码（数学语法验证 0 失败抓不到此类问题）
   - **作图规范**：图一律包 `<figure>`+`<figcaption>`（图注中公式用 LaTeX）；SVG 用 viewBox + width="100%" 响应式、role="img" + aria-label、fill="currentColor"（暗色主题自适应）；SVG 文字用 Unicode 数学字符（见 §2）；matplotlib 图 base64 内嵌
-  - **交付前渲染验证三件套**：① 数学片段全量 KaTeX 渲染 0 失败（node + katex.renderToString：display 片段传 displayMode:true、宏用 macros 选项、剥 script/style/pre 区域避免误提取源码）；② jsdom 端到端：正文无残留 `\(`/`\[` 定界符、无 .katex-error 元素；③ 裸数学扫描：jsdom 遍历文本节点（排除 script/style/pre/已渲染 .katex），除 §2 豁免项外无裸数字/数学符号
+  - **交付前渲染验证四件套**：① 数学片段全量 KaTeX 渲染 0 失败（node + katex.renderToString：display 片段传 displayMode:true、宏用 macros 选项、剥 script/style/pre 区域避免误提取源码）；② jsdom 端到端：正文无残留 `\(`/`\[` 定界符、无 .katex-error 元素；③ 裸数学扫描：jsdom 遍历文本节点（排除 script/style/pre/已渲染 .katex），除 §2 豁免项外无裸数字/数学符号；④ **字体完整性检查（必做）**：构建后静态验证 CSS 中 @font-face 数量 == 字体文件数（KaTeX 0.16 为 20）且每个 src 全部为 data URI、无 fonts/ 残留引用；有浏览器环境时用 playwright/chromium 验证 document.fonts.check('16px KaTeX_Main') 为 true 且 .mrel 等符号元素 computed font-family 为 KaTeX_Main（2026-08-25 字体 bug 实战教训：语法验证全过但字体缺失，≪ 等符号静默 fallback 系统字体乱码）
 
 ## 交付流程
 
@@ -93,7 +93,7 @@ description: "教材讲义写作。创建或修订教材类 HTML（数学/统计
    - 代码实测：运行教材算例代码，报告与教材结论的差异
 7. 主会话合并反馈、联网调研判断对错、修订教材
 8. 重复 5-7，直到完成标准
-9. 渲染验证三件套（见第 6 条）
+9. 渲染验证四件套（见第 6 条，含字体完整性检查）
 10. 交付（含开篇声明、解答折叠、勘误登记）
 
 ## 完成标准
