@@ -27,7 +27,7 @@ description: "教材讲义写作。创建或修订教材类 HTML（数学/统计
   - 所有变量与数学数字一律 LaTeX 包裹（\( \) / \[ \]），禁止裸变量、裸 "="（"总误差 = 中心化误差" 必须写 \(e=z\)）、裸数值比较（"CRB=0.25" 必须写 \(\mathrm{CRB}=0.25\)）、裸分数/平方（"1/9" → \(1/9\)，"3^x/4" → \(3^x/4\)）
   - 表格单元格（验证表、反例表、习题表）与正文同标准；教学循环记录等元信息表格同样 LaTeX 化主要数学表达式
   - 数学内禁止 HTML 实体（`&lt;`/`&gt;` 写 `\lt`/`\gt`）与裸 `<`/`>`——裸尖括号会被浏览器解析为标签，导致 auto-render 定界符匹配失败（实战教训：`N<J` 使 DOM 断裂、渲染残留）
-  - **算子正体化**（ISO 80000-2 惯例，2026-08-25 补充）：数学变量（x、θ、e、g、ξ）斜体；算子与缩写正体——概率测度 \(\mathrm{P}_	heta\)、均匀分布 \(\mathrm{U}[0,1]\)、分布名 \(\mathrm{Bernoulli}/\mathrm{Bin}/\mathrm{Poisson}\)、\(\mathrm{CRB}/\mathrm{HCR}/\mathrm{MSE}/\mathrm{SNR}/\mathrm{DFT}\) 等；期望 \(\mathbb E\)、方差 \(\operatorname{Var}\) 正体。例外：投影算子 \(P_{\mathcal H}\) 与信息矩阵 \(I_F\) 保持斜体（数学文献主流写法），正交投影算子若需区分可写 \(\mathrm{P}_{\mathcal H}\)
+  - **算子正体化**（ISO 80000-2 惯例，2026-08-25 补充）：数学变量（x、θ、e、g、ξ）斜体；算子与缩写正体——概率测度 \(\mathrm{P}_\theta\)、均匀分布 \(\mathrm{U}[0,1]\)、分布名 \(\mathrm{Bernoulli}/\mathrm{Bin}/\mathrm{Poisson}\)、\(\mathrm{CRB}/\mathrm{HCR}/\mathrm{MSE}/\mathrm{SNR}/\mathrm{DFT}\) 等；期望 \(\mathbb E\)、方差 \(\operatorname{Var}\) 正体。例外：投影算子 \(P_{\mathcal H}\) 与信息矩阵 \(I_F\) 保持斜体（数学文献主流写法），正交投影算子若需区分可写 \(\mathrm{P}_{\mathcal H}\)
   - **豁免项**（不需要 LaTeX）：文献元数据（年份/页码/DOI/zbMATH 号）、交叉引用编号（定理 3.3、式 (2.1)、小节号）、代码块（`<pre>` 内程序输出）、轮次/计数类文字（"4/4 全对"）、SVG 图内文字（Unicode 数学字符，见 §6）
   - SVG 图内文字用 Unicode 数学字符（H₁、H₂⊂H₁、⇒），**不用** HTML 实体（`&#8321;`）——实体与字符渲染等价但可读性差；图注（figcaption）中的公式必须用 LaTeX
 - **书末设符号索引**：符号+含义+首次出现位置，HTML 内做锚点跳转（Rudin 书末 List of Special Symbols、Axler Symbol Index 做法）
