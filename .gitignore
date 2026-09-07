@@ -1,2 +1,5 @@
 __pycache__/
-*.py[cod]
+*.pyc
+.tools/
+.local-evidence/
+.venv/

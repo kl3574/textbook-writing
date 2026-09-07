@@ -1,58 +1,53 @@
-# textbook-writing
+# textbook-writing v3.0.0
 
-数学/统计教材 HTML 讲义的写作技能：六项正交标准 + 独立教学评估 + 可重放机械验收。v2.2.0（2026-08-30）新增三种 HTML 交付形态、分层公式门、哈希绑定清单、显式代码运行时、响应式浏览器门和连续双轮验收。
+面向自学者的数学、统计、优化与算法教材技能。保留完整证明、统一符号、例题反例、练习全解与离线交付；新增对象绑定、统一发布检查、修订影响分析和可复现版本对照。
 
-适用于估计理论、优化算法等数学/统计课程讲义（HTML）的创建与修订。
+## 开始使用
 
-## 定位
+把仓库完整放入所用 agent 的技能目录，保留 SKILL.md 与 references/scripts 的相对路径。不要只复制入口而丢掉规范和检查工具。
 
-面向零基础自学读者，锚定"富教学工程"路线（Axler / Strang / Stein-Shakarchi 端），而非极简风格（Rudin 端）——紧凑留白在课堂场景是优点，在自学场景是硬伤。
+```bash
+python -m pip install -r requirements.txt
+python scripts/validate_skill_package.py .
+python -m unittest discover -s tests -v
+python examples/gls/build.py --out /absolute/new/gls-case
+```
 
-## 六项正交标准
+测试会明确标出未配置的 KaTeX/浏览器项，不把跳过当完成。完整 CI 还安装固定 KaTeX 和 Chromium，并执行真实严格解析及 file:// 双视口验收。依赖安装需要网络授权；教材代码执行需要明确信任。
 
-每条标准对应一个独立职能，检查清单互不重叠：
+## 三步改造
 
-| 标准 | 职能 | 要点 |
-|---|---|---|
-| 正确性 | 数学上对 | 证明无跳步、证明分级（压缩处显式标注"证明略"）、变量就地标注形状、引用注明、章末 Notes and References |
-| 符号系统 | 记号统一 | 符号约定表、学界主流锚定、系列一致、公式 LaTeX 化细则（禁裸 "="/裸数值比较/DOM 解码后残留的双重编码实体，豁免文献元数据与交叉引用）、书末符号索引 |
-| 结构 | 知识组织 | 系列大纲先行（首次出现/回访/延迟困难）、节级模板（目的地框→动机段→定理→证明→直觉解释→假设检查→算例→边界情形→习题）、五要素、章末要点总结 |
-| 教学法 | 学得懂 | 类比/算例/反例、反例制度化四件套（假设检查段、证明或给反例句式、概念缺口预埋、复用清单）、习题两级体系（提示/星号/扩展/双向引用/出处标注） |
-| 验证 | 检验过 | 特例代码实测、显式解释器与依赖预检、独立教学评估、分层公式门、哈希绑定清单 |
-| 交付 | 拿得到 | authoring-master / note-fragment / standalone-publication 三种形态、解答折叠、离线 KaTeX、响应式双视口、连续双轮验收 |
+| 阶段 | 实现 |
+|---|---|
+| 修复验收 | 统一公式定界符、公式 ID 清单、代码—输出绑定、未运行状态、被动笔记、组件滚动与字体声明检查 |
+| 内容与评审 | 定理—证明—来源—算例—题解关系；修改/来源变动的传递影响；物理移除答案的学习者输入；分开的内容和教学回执 |
+| 对照评测 | 冻结 v2.2.0 的实际故障回归；8 类公开行为任务；原版/新版/无技能的隔离输入与日志汇总 |
 
-## 交付流程
+第三步中，工程对照已可执行并随 CI 重跑；模型行为盲测和真实人类学习实验**没有被本版本虚报为完成**。请查看实际回执，而不是从版本号推断教学质量。
 
-1. 声明交付 profile，建立外部哈希绑定的验收清单与执行环境
-2. 按六项标准起草、自审，并在权威主稿层运行严格公式门
-3. 由不参与写作的学习者完成做题、反例和代码复算；无独立通道时明确报告未运行
-4. 对每次 note-fragment 投影重新验证源摘要、变换指标、公式与禁止元素
-5. 对 standalone-publication 执行严格 KaTeX、代码输出、字体、链接、交互和桌面/窄屏检查
-6. 在所有输入未变化时从磁盘重新运行两次完整机械验收
-7. 分别报告教学闭环与机械闭环状态后交付
+## 版本对比案例
 
-本循环定位为**缺陷发现器**而非质量认证：通过只说明本轮未发现对应问题。有效反例的判定由主会话负责；独立学习者只出报告与修改建议，不改权威文件。
+对两次测量 y=(1,3)、噪声方差=(1,4)，逆方差加权结果为 1.4，方差为 0.8；普通平均为 2，方差为 1.25。脚本使用精确有理数生成数值，并复算两段 Python。
 
-机械验收细则见 [`references/acceptance.md`](references/acceptance.md)。仓库提供：
+正常输出：原版与新版均通过相应执行检查。故意交换这两个算例的展示输出：原版按章节查找字符串，仍通过；新版按 example-id 绑定，报告两个 program_output_mismatch。
 
-- `scripts/check_textbook_contract.py`：profile、摘要、计数、公式结构、运行时、输出和交互 fixture 检查；
-- `scripts/browser_acceptance.py`：显式 Playwright/Chromium 环境下的桌面与窄屏回执；
-- `tests/test_textbook_contract.py`：旧失败形态、负例和不同输入的前向用例。
+这是同一人工故障输入的工程回归，**不是原版/新版模型生成质量 A/B**。优势是可复現地修复已知漏检；代价是更多对象元数据、依赖与审查记录。尚未量化生成成本或人类学习收益。
 
-## 变更记录
+案例源：`examples/gls/build.py`；生成 reader.html、learner.html、content.json、manifest.json、comparison.json 与两轮回执。独立审稿或学习者回执缺失时，总状态保留 UNVERIFIED/BLOCKED，即使机械部分通过。
 
-- **v2.2.0**（2026-08-30）：根据 44 篇估计理论教材与 Zotero 投影的哈希回放复盘，新增 `TextbookArtifactProfile/v1`、`TextbookAcceptanceManifest/v1`、三层公式验证、显式 Python 运行时预检、组件级宽内容容器、双视口浏览器门和 fixture-derived 交互探针；把独立教学评估与连续双轮机械验收分开报告。
-- **v2.1.2**（2026-08-25）：补充 KaTeX 字体文件与 `@font-face` 数量一致性，以及浏览器级字体检查。
-- **v2.1**（2026-08-25）：新增 HTML 渲染与作图规范——公式 LaTeX 化细则（禁止裸 "="、裸数值比较、数学内 HTML 实体；豁免文献元数据与交叉引用编号；SVG 文字用 Unicode 数学字符）、作图格式（figure+figcaption、SVG 响应式/无障碍/暗色主题适配、图注 LaTeX）、KaTeX 完全自包含（woff2 data URI 内嵌、禁 CDN）、构建链路备忘（heredoc+python raw 防反斜杠翻倍）、交付前渲染验证三件套（全量 KaTeX 渲染 0 失败、jsdom 端到端、裸数学扫描）。实战来源：Todros & Tabrikian 2010 Part I 文献讲义重写（957+ 数学片段 0 失败）。
-- **v2.0**（2026-08-19）：六部主流教材（Linear Algebra Done Right、Rudin 数学分析原理、Stein-Shakarchi 分析四卷、Strang 线性代数、Convex Optimization、Numerical Optimization）调研后全面升级——节级模板、系列动机叙事线、反例制度化四件套、习题两级体系、证明分级、书末符号索引、章末 Notes、开篇声明、算例代码交付、勘误维护。
-- **v1.0**（2026-08-19）：初版——六项正交职能整合 + 子 agent 教学迭代循环。
+## 文档
 
-## 安装
+- [技能入口](SKILL.md)
+- [写作与教学要求](references/authoring.md)
+- [内容对象、修改影响与独立评审](references/content-and-review.md)
+- [发布验收与迁移](references/acceptance.md)
+- [评测协议与一手参考](references/evaluation.md)
+- [v3.0.0 发布说明](docs/release-v3.0.0.md)
 
-- Claude 桌面应用：设置 → Skills → 将 `SKILL.md` 放入 skills 目录（或通过 Save skill 安装）
-- Codex：可通过 `skill-installer` 从 `kl3574/textbook-writing` 的不可变版本标签安装；安装后运行仓库单元测试和一次真实 HTML 验收
-- 其他支持技能的环境：克隆本仓库后配置技能路径指向 `SKILL.md`
+## 兼容性与发布
 
-## 使用
+版本升级到 3.0.0，因为发布批准改用 TextbookReleaseManifest/v2；旧 CLI 保留为局部迁移检查，不能再凭旧 PASS 宣称新版发布验收完成。冻结的 legacy 文件用于基线，不作为新发布入口。
 
-写作或修订教材章节时引用本技能（如 `/textbook-writing`），Claude 将按六项标准写作并执行交付前验证循环。
+CI 在隔离分支上验证；只有 main 上以 `release:` 开头的提交且所有测试通过，发布作业才创建 VERSION 对应标签与 GitHub Release。不会覆盖已有不同提交的标签，不改仓库保护规则。Release 附源代码包和真实 CI 证据，不附依赖/字体文件。
+
+“技能软件发布通过”“教材机械验收通过”“数学审稿通过”“学习者理解通过”是四件不同的事。

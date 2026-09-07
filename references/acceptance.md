@@ -1,161 +1,56 @@
-# 教材 HTML 交付形态与验收契约
+# TextbookReleaseManifest/v2：统一发布验收
 
-本参考只处理可机械检验的交付边界。数学论断是否正确、来源是否真的支撑
-论断、证明是否完整，仍由教材正文审查和独立教学评估负责。
+v3 的唯一发布入口是 `scripts/verify_release.py`。旧 TextbookAcceptanceManifest/v1 和旧 CLI 保留为局部迁移检查，不能替代新发布流程；原始 v2.2 检查器冻结在 legacy_contract.py，仅用于基线重放。
 
-## 1. 先声明一种交付形态
+## 三个 profile
 
-同一内容可以有多个 HTML 表示，但每个产物必须只声明一种 profile。
+- authoring-master：稳定对象身份、公式注册表、任务和来源定位；不要求独立浏览器运行。
+- note-fragment：单一 `<div data-schema-version="9">`；被动元素/属性/URL 允许列表；不含脚本、样式、事件属性、活动 URL 或独立运行时。不是 Zotero 宿主的安全审计或写入授权。
+- standalone-publication：完整 HTML、离线资源、参考链接可以外连但不能自动请求外部资源；桌面 1440×900 和窄屏 390×844 验证正文、展开解答和组件滚动。
 
-### `authoring-master`
+渲染可选自包含 KaTeX 或预渲染原生 MathML；原生 MathML 仍保留 LaTeX 并做相同 KaTeX 语法验证，不需要分发字体。KaTeX 路径需要字体资源时，构建端应检查所需字体完整性和许可，不应把操作系统字体文件打包分发。
 
-面向继续修订和回放的权威主稿。
+## 清单字段
 
-- 保留公式锚点、任务标识、来源定位和审查所需的局部属性。
-- 记录全部 ID、公式节点和任务标识的顺序与数量。
-- 修订必须保留既有稳定标识，除非另有经过审查的迁移表。
-- 不能因为下游投影不需要某个锚点，就从主稿中删除它。
-
-### `note-fragment`
-
-面向 Zotero 等宿主应用的被动 HTML 片段。
-
-- 只有一个顶层 `<div data-schema-version="9">`。
-- 不含 `<html>`、`<head>`、`<body>`、`<script>`、`<style>`、`<link>`、
-  `<iframe>`、`<object>`、`<embed>` 或独立运行时。
-- 删除仅供本地工作流使用的隐藏锚点时，必须记录源主稿摘要、投影摘要、
-  变换指标和 profile 专属计数。
-- 该 profile 只约束笔记表示；它不授权创建、修改或删除 Zotero 条目、
-  父项、附件、PDF 或下载文件。
-
-### `standalone-publication`
-
-面向浏览器离线阅读的完整文档。
-
-- 有完整 HTML 文档结构；渲染所需 CSS、JavaScript 和字体全部内嵌。
-- 参考文献链接可以指向外部来源，但页面加载不得自动请求外部运行时。
-- 表格、代码、长 URL 和宽公式必须在组件内部可滚动；不得靠
-  `body`/`html` 的 `overflow-x: hidden|clip` 掩盖内容。
-- 桌面和窄屏浏览器均需验证文档级无横向溢出。
-
-不同 profile 的字节数和公式节点数可以不同。只允许在同一 profile、同一
-源摘要和同一变换契约内做精确比较，不能把跨 profile 的差异误报为数据丢失。
-
-## 2. `TextbookAcceptanceManifest/v1`
-
-验收前创建一个外部固定的构建清单。计数和摘要由构建者写入，验收器重新
-计算；不要在构建脚本和验收脚本中分别维护两套常量。
+根对象：schema、profile、artifact、inventory、task、content；按对象类型自动启用数学、代码与浏览器检查，不能仅以开关关闭必需检查。
 
 ```json
 {
-  "schema": "TextbookAcceptanceManifest/v1",
+  "schema": "TextbookReleaseManifest/v2",
   "profile": "standalone-publication",
-  "artifact": {
-    "sha256": "64-lowercase-hex"
-  },
-  "counts": {
-    "chapters": 1,
-    "math_nodes": 2,
-    "python_blocks": 1,
-    "program_outputs": 1,
-    "details": 1,
-    "formula_anchors": 0,
-    "task_ids": 0
-  },
-  "math": {
-    "require_katex": true
-  },
-  "runtime": {
-    "python_executable": "/absolute/path/to/python",
-    "required_imports": []
-  },
-  "interaction_probe": {
-    "query": "岭回归",
-    "min_matches": 1,
-    "max_matches": 1
-  }
+  "artifact": {"sha256": "HTML原始UTF-8字节的SHA-256"},
+  "inventory": {"math": ["eq-1"], "code": ["code-1"], "output": ["out-1"]},
+  "task": {"proof_policy": "full", "prerequisites": ["高中代数"]},
+  "content": {"path": "content.json", "sha256": "注册表SHA-256"},
+  "math": {"path": "/absolute/katex.js", "sha256": "运行时SHA-256", "version": "固定版本", "macros": {}},
+  "runtime": {"python_executable": "/absolute/python", "required_imports": [], "timeout_seconds": 30},
+  "browser": {"executable": "/absolute/chromium", "renderer": "native-mathml", "font_families": []},
+  "reviews": {}
 }
 ```
 
-规则：
+这是字段说明，不是可直接通过的清单：必须使用真实摘要。可执行完整案例由 examples/gls/build.py 生成。inventory 是编写阶段固定的预期 ID 顺序，与 DOM 独立重读比较；不要删除实际漏掉的 ID 来凑数。公式需有 `.math`，代码 `code.language-python` 和 `data-example-id`；展示输出 `pre.program-output` 的 `data-for` 指向对应 example-id。各自还有唯一 DOM id。
 
-- 清单本身需要调用方提供的外部 SHA-256；自报摘要不能自证。
-- `artifact.sha256` 必须等于待验收 HTML 原始字节摘要。
-- `counts` 中出现的每个字段都必须精确相等；不需要的字段可以省略。
-- `details` 只统计章节 `<article class="chapter">` 内的折叠答案；如需约束全书
-  所有折叠块，另声明 `document_details`，避免目录说明等全局组件混入章节计数。
-- `interaction_probe.query` 必须来自已接受的教材内容，并声明预期命中范围；
-  禁止在通用技能中硬编码某一教材的词语。
-- 变换后公式数量改变时，更新相应 profile 的清单并保留源清单，不能修改
-  历史报告来假装旧产物具有新计数。
+代码输出采用**规范格式后的 stdout 精确比较**，一例一输出；它不是通用浮点/图像等价判断。随机或容差实验应在代码中实现有理论依据的数值断言并输出稳定摘要，记录种子、容差和适用范围。不能为了通过测试任意放宽容差。
 
-## 3. 分层数学验证
+## 执行与状态
 
-在 `authoring-master`、每次投影后以及 `standalone-publication` 组装后分别执行：
+```bash
+python scripts/verify_release.py --html book.html --manifest manifest.json \
+  --expected-manifest-sha256 "$(cat manifest.sha256)" \
+  --allow-execution --report release-receipt.json
+```
 
-1. DOM 提取每个声明的数学节点；不从整份 HTML 用正则猜公式。
-2. 拒绝数学节点中的制表符、未配对定界符、DOM 解码后仍残留的双重编码
-   实体，以及被放进定界符的解释性 prose。HTML 序列化器把 `<`/`>` 写成
-   `&lt;`/`&gt;` 属于正常的一层转义，验收器必须先按 DOM 解码，不能直接
-   扫描原始序列化文本误报；TeX 对齐符使用的 `&amp;` 同理解码为 `&`。
-3. 用与交付一致的 KaTeX 版本、`throwOnError: true` 和明确的
-   `displayMode` 渲染全部节点。
-4. 浏览器展示可以选择容错回退；验收通道不能用 `throwOnError: false`
-   把解析失败算作成功。
-5. 对源主稿额外核对公式锚点和任务 ID 的精确顺序；对投影核对变换指标。
+清单的外部固定摘要和全部绑定文件在两轮分别重新读取；报告路径默认不得覆盖。两轮必须相同，不把旧报告当新结果。命令返回值：0=完整 PASS，1=失败，2=未验证或环境受阻。
 
-KaTeX 通过只证明语法可渲染，不证明公式语义、维度或定理正确。
+`mechanical_status` 汇总结构、内容关系、公式语法、执行、浏览器；总 status 还包含内容审查与独立教学回执。任一实际缺陷为 FAIL；必需环境不可用为 BLOCKED；没有执行/证据为 UNVERIFIED；没有该类对象为 NOT_APPLICABLE。没有审查回执时，即便机械通过，总状态也不为 PASS。
 
-## 4. 可执行示例运行时
+对数学节点支持四种定界符和含 LaTeX annotation 的预渲染 MathML。KaTeX 固定版本与哈希，throwOnError=true、strict=error、trust=false；检查残留实体、制表符与未登记公式定界符。它不检查维度或数学真理，也不能保证发现所有没有任何数学标记的自然语言公式。
 
-- 清单声明一个绝对 Python 可执行文件及课程真正需要的导入项。
-- 先运行依赖预检，再用同一可执行文件运行所有示例并核对静态输出。
-- 不允许因当前验证进程的 `sys.executable` 恰好可用就隐式继承它。
-- 若环境不可复现，状态是 `UNVERIFIED_RUNTIME`，不能把代码块数量当成运行通过。
-- 数值复算是教学与实现检查，不替代理论证明。
+浏览器检查实际 .math 渲染、错误、图片、离线请求、初始/展开答案状态、组件滚动、裁切、字体声明与加载；不单独以 document.fonts.check(true) 当作字体存在。字体与渲染不等同于全字符字形覆盖认证；还应对高风险图形进行人工视觉核对。没有浏览器时不得用静态计数冒充。
 
-## 5. 响应式与浏览器验收
+## 安全与重放
 
-`standalone-publication` 至少检查一个桌面视口和一个窄屏视口；推荐
-`1440×900` 与 `390×844`。
+`--allow-execution` 只适用于已审阅、可信代码。独立临时目录、受限环境变量、超时及 Python -I 减少偶然依赖，**不是操作系统安全沙箱**。不可信教材代码须在调用方提供的容器/受限环境执行。运行时路径显式给定，不默默继承；记录二进制摘要，不用目录名充当版本证据。
 
-每个视口都核对：
-
-- `document.documentElement.scrollWidth <= clientWidth + 1`；
-- 所有宽表格都有最近的 `.table-wrap`，宽公式和代码有组件级滚动；
-- `html` 和 `body` 没有用横向隐藏来掩盖溢出；
-- 公式节点数、实际 `.katex` 节点数和静态验收计数一致；
-- 字体加载完成且要求的 KaTeX 字体可用；
-- 页面没有自动发起 HTTP(S) 运行时请求；
-- 搜索、答案展开/收起等交互按清单中的 fixture-derived 预期工作。
-
-浏览器验收脚本必须由与 Playwright 原生扩展 ABI 匹配的 Python 解释器启动，
-并显式传入 Playwright 根目录和 Chromium 可执行文件。仅记录包目录而不确认
-解释器版本，不能视为可重放环境。
-
-## 6. 两类互不替代的闭环
-
-### 教学闭环
-
-由不参与写作的学习者完成做题、反例和代码复算。可以是独立 agent、人工
-读者或隔离的评估会话。若用户明确禁用相应协作方式，保留这个边界并报告
-`PEDAGOGICAL_REVIEW_NOT_RUN`；机械测试不能替代独立理解。
-
-### 机械闭环
-
-对同一未变化的产物连续运行两次完整验收，两份报告都为 PASS，且 HTML、
-源清单和关键运行时摘要完全相同。第二轮不是读取第一轮结果，而是重新打开
-全部输入并复算。
-
-最终交付要分别报告两个闭环的状态；“连续两轮”不能只指其中一个却笼统写成
-“全部验证完成”。
-
-## 7. 配套脚本
-
-- `scripts/check_textbook_contract.py`：profile、摘要、计数、公式结构、运行时、
-  输出和交互 fixture 的确定性静态/可执行检查。
-- `scripts/browser_acceptance.py`：在显式提供 Playwright 与 Chromium 时生成
-  桌面/窄屏浏览器回执。
-
-脚本是可复用底线，不是完整教材审稿人。项目可以增加更强的来源、证明、
-可访问性和视觉检查，但不得删除上述边界后仍沿用 PASS 名称。
+旧 CLI 为兼容而保留原执行方式；不要对不可信输入使用它。发布不自动上传附件、改写用户库、改动权限或联网下载资源。

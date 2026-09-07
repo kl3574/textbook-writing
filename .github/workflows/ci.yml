@@ -1,24 +1,92 @@
-name: validate-skill
-
+name: validate-and-release
 on:
   push:
   pull_request:
   workflow_dispatch:
-
 permissions:
   contents: read
-
+concurrency:
+  group: textbook-${{ github.ref }}
+  cancel-in-progress: false
 jobs:
   validate:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
-      - name: Compile scripts
-        run: python -m compileall -q scripts tests
-      - name: Run contract tests
-        run: python -m unittest discover -s tests -v
-      - name: Validate skill frontmatter and resource links
-        run: python scripts/validate_skill_package.py .
+          python-version: '3.11'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install explicit validation runtimes
+        run: |
+          python -m pip install -r requirements.txt
+          python -m playwright install --with-deps chromium
+          npm install --prefix .tools katex@0.18.7
+          echo "KATEX_JS=$GITHUB_WORKSPACE/.tools/node_modules/katex/dist/katex.js" >> "$GITHUB_ENV"
+          echo 'KATEX_VERSION=0.18.7' >> "$GITHUB_ENV"
+          python - <<'PY'
+          import os
+          from playwright.sync_api import sync_playwright
+          with sync_playwright() as p:
+              with open(os.environ['GITHUB_ENV'], 'a') as f:
+                  f.write('CHROMIUM=' + p.chromium.executable_path + '\n')
+          PY
+      - name: Validate package and run all tests without local-policy skips
+        env:
+          TEXTBOOK_BROWSER_TESTS: '1'
+        run: |
+          mkdir -p .local-evidence
+          python -m compileall -q scripts tests examples
+          python scripts/validate_skill_package.py . | tee .local-evidence/package.log
+          python -m unittest discover -s tests -v 2>&1 | tee .local-evidence/tests.log
+      - name: Reproduce paired GLS regression and full two-round mechanical acceptance
+        env:
+          TEXTBOOK_REQUIRE_FULL_MECHANICAL: '1'
+        run: python examples/gls/build.py --out .local-evidence/gls | tee .local-evidence/gls.log
+      - name: Record reproducibility metadata
+        if: always()
+        run: |
+          mkdir -p .local-evidence
+          git rev-parse HEAD > .local-evidence/commit.txt
+          python --version > .local-evidence/python.txt
+          python -m pip freeze > .local-evidence/python-packages.txt
+          node --version > .local-evidence/node.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: validation-evidence
+          path: .local-evidence/
+          include-hidden-files: true
+  release:
+    needs: validate
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && startsWith(github.event.head_commit.message, 'release:')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: validation-evidence
+          path: evidence
+      - name: Create immutable-target release with source and validation evidence
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          version="$(tr -d '\n\r' < VERSION)"
+          [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
+          tag="v$version"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            actual="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$tag" --jq '.object.sha')"
+            [[ "$actual" == "$GITHUB_SHA" ]] || { echo 'Refusing to move an existing release tag'; exit 1; }
+            exit 0
+          fi
+          git archive --format=zip --prefix=textbook-writing/ HEAD > "textbook-writing-$tag.zip"
+          (cd evidence && zip -qr ../validation-evidence.zip .)
+          gh release create "$tag" "textbook-writing-$tag.zip" validation-evidence.zip \
+            --target "$GITHUB_SHA" --title "textbook-writing $tag" \
+            --notes-file "docs/release-$tag.md" --latest

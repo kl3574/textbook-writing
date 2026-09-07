@@ -1,63 +1,33 @@
 #!/usr/bin/env python3
-"""Validate the repository-level textbook-writing skill package."""
-
+"""Validate package layout, version, links and frozen baseline identity."""
 from __future__ import annotations
-
 import argparse
+import hashlib
+import json
 from pathlib import Path
 import re
 
-
-REQUIRED_RESOURCES = (
-    "references/acceptance.md",
-    "scripts/check_textbook_contract.py",
-    "scripts/browser_acceptance.py",
-    "tests/test_textbook_contract.py",
-    "VERSION",
-)
+REQUIRED=("references/authoring.md","references/content-and-review.md","references/acceptance.md","references/evaluation.md","scripts/verify_release.py","scripts/release_contract.py","scripts/browser_checks.py","scripts/content_tools.py","scripts/behavior_eval.py","scripts/check_textbook_contract.py","scripts/browser_acceptance.py","tests/test_textbook_contract.py","tests/test_release_v3.py","evals/behavior_cases.json","examples/gls/build.py","requirements.txt","VERSION")
 
 
-def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("root", nargs="?", type=Path, default=Path.cwd())
-    args = parser.parse_args()
-    root = args.root.expanduser().resolve()
-    errors: list[str] = []
-    skill = root / "SKILL.md"
-    if not skill.is_file() or skill.is_symlink():
-        errors.append("SKILL.md must be an ordinary file")
-        text = ""
-    else:
-        text = skill.read_text(encoding="utf-8")
-    if not re.match(r"^---\n(?s:.*?)\n---\n", text):
-        errors.append("SKILL.md frontmatter is missing or malformed")
-    if not re.search(r'^name:\s*["\']?textbook-writing["\']?\s*$', text, flags=re.M):
-        errors.append("frontmatter name must be textbook-writing")
-    description = re.search(r'^description:\s*["\']?(.*?)["\']?\s*$', text, flags=re.M)
-    if description is None or len(description.group(1).strip()) < 40:
-        errors.append("frontmatter description is missing or too short")
-    for relative in REQUIRED_RESOURCES:
-        path = root / relative
-        if not path.is_file() or path.is_symlink():
-            errors.append(f"required resource is missing or not ordinary: {relative}")
-    version_path = root / "VERSION"
-    if version_path.is_file() and version_path.read_text(encoding="utf-8").strip() != "2.2.0":
-        errors.append("VERSION must be 2.2.0")
-    linked_paths = re.findall(r"\]\((references/[^)#]+|scripts/[^)#]+)\)", text)
-    for relative in linked_paths:
-        if not (root / relative).is_file():
-            errors.append(f"SKILL.md links to a missing resource: {relative}")
-    print(
-        {
-            "status": "PASS" if not errors else "FAIL",
-            "skill": str(skill),
-            "required_resource_count": len(REQUIRED_RESOURCES),
-            "linked_resource_count": len(linked_paths),
-            "errors": errors,
-        }
-    )
-    return 0 if not errors else 1
+def main():
+    p=argparse.ArgumentParser(description=__doc__);p.add_argument('root',nargs='?',type=Path,default=Path.cwd());a=p.parse_args();root=a.root.resolve();errors=[]
+    text=(root/'SKILL.md').read_text(encoding='utf-8')
+    version=(root/'VERSION').read_text().strip()
+    if not re.fullmatch(r'\d+\.\d+\.\d+',version):errors.append('VERSION must be semantic x.y.z')
+    if not text.startswith('---\n') or not re.search(r'^name:\s*["\']?textbook-writing["\']?\s*$',text,re.M):errors.append('invalid frontmatter/name')
+    description=re.search(r'^description:\s*(.+)$',text,re.M)
+    if not description or len(description.group(1))<40:errors.append('description missing/too short')
+    if 'v'+version not in text:errors.append('SKILL version does not match VERSION')
+    for relative in REQUIRED:
+        path=root/relative
+        if not path.is_file() or path.is_symlink():errors.append('missing/not ordinary: '+relative)
+    for relative in re.findall(r'\]\(((?:references|scripts)/[^)#]+)\)',text):
+        if not (root/relative).is_file():errors.append('broken resource link: '+relative)
+    for relative,expected in [('scripts/legacy_contract.py','bbd4cf8a223b98887def13dd1f21ab9781ee8658'),('scripts/legacy_browser.py','04c02a387edd35535d0b25e651819462118cc45b')]:
+        b=(root/relative).read_bytes();actual=hashlib.sha1(b'blob '+str(len(b)).encode()+b'\0'+b).hexdigest()
+        if actual!=expected:errors.append('frozen baseline changed: '+relative)
+    print(json.dumps({'status':'FAIL' if errors else 'PASS','version':version,'errors':errors},ensure_ascii=False))
+    return 1 if errors else 0
 
-
-if __name__ == "__main__":
-    raise SystemExit(main())
+if __name__=='__main__':raise SystemExit(main())
