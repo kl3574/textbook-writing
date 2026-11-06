@@ -1,10 +1,23 @@
-# textbook-writing v3.0.0
+# textbook-writing v3.1.0
 
 面向自学者的数学、统计、优化与算法教材技能。保留完整证明、统一符号、例题反例、练习全解与离线交付；新增对象绑定、统一发布检查、修订影响分析和可复现版本对照。
 
+## LaTeX/PDF 与模板
+
+新教材默认 TeX 源码 + PDF；用户提供模板优先，其次沿用现有稿件模板，无指定时使用 `assets/latex-template/` 的固定快照。已有 HTML 工程继续使用 v3 的对象绑定与统一验收，不自动迁移格式。
+
+```bash
+python scripts/init_latex_project.py --output /absolute/new-chapter \
+  --language zh --title '统计估计' --course-name '统计学'
+python scripts/init_latex_project.py --output /absolute/new-book \
+  --template /absolute/my-template --main book.tex --engine xelatex
+```
+
+输出目录必须不存在。用户模板按原字节复制，保留自己的目录/宏/字体与构建约定；内置英文用 `--language en`。创建回执只证明初始化，不能代替 PDF 构建、视觉检查或教学评估。详见 [LaTeX 规范](references/latex-format.md)。
+
 ## 开始使用
 
-把仓库完整放入所用 agent 的技能目录，保留 SKILL.md 与 references/scripts 的相对路径。不要只复制入口而丢掉规范和检查工具。
+Codex 个人安装使用 `${CODEX_HOME:-$HOME/.codex}/skills/textbook-writing`，与其他 agent 的共享目录分开。把仓库完整放入所用 agent 的技能目录，保留 SKILL.md 与 references/scripts 的相对路径。不要只复制入口而丢掉规范和检查工具。
 
 ```bash
 python -m pip install -r requirements.txt
@@ -42,11 +55,12 @@ python examples/gls/build.py --out /absolute/new/gls-case
 - [内容对象、修改影响与独立评审](references/content-and-review.md)
 - [发布验收与迁移](references/acceptance.md)
 - [评测协议与一手参考](references/evaluation.md)
+- [v3.1.0 发布说明](docs/release-v3.1.0.md)
 - [v3.0.0 发布说明](docs/release-v3.0.0.md)
 
 ## 兼容性与发布
 
-版本升级到 3.0.0，因为发布批准改用 TextbookReleaseManifest/v2；旧 CLI 保留为局部迁移检查，不能再凭旧 PASS 宣称新版发布验收完成。冻结的 legacy 文件用于基线，不作为新发布入口。
+v3.1.0 合并本机原标为 v2.3.0 的 LaTeX 功能与远端 v3.0.0，不回退 HTML 检查。v3.0.0 升级主版本是因为发布批准改用 TextbookReleaseManifest/v2；旧 CLI 保留为局部迁移检查，不能再凭旧 PASS 宣称新版发布验收完成。冻结的 legacy 文件用于基线，不作为新发布入口。
 
 CI 在隔离分支上验证；只有 main 上以 `release:` 开头的提交且所有测试通过，发布作业才创建 VERSION 对应标签与 GitHub Release。不会覆盖已有不同提交的标签，不改仓库保护规则。Release 附源代码包和真实 CI 证据，不附依赖/字体文件。
 

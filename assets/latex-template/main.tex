@@ -1,0 +1,52 @@
+% ===============================================================
+% LIST OF FILES 
+% Lecture Notes  --  main file  (compile with pdfLaTeX)
+%  Structure:
+%     preamble/   packages, style, macros, boxes, code settings
+%     sections/   one file per section of the lecture
+%     figures/    TikZ / pgfplots figures (and put images here too)
+%     code/       source files shown with \lstinputlisting
+% ===============================================================
+\documentclass[11pt,a4paper]{article}
+
+% ----- Course metadata (edit these) -----
+\newcommand{\coursecode}{Subject Code}
+\newcommand{\coursename}{Subject Name}
+\newcommand{\lecnumber}{1}
+\newcommand{\lectitle}{Title of the Topic}
+\newcommand{\lecturer}{Name of the Professor}
+\newcommand{\semester}{Semester / Session}
+
+% ----- Preamble (order matters: colors in style.tex are used by later files) -----
+\input{preamble/packages}
+\input{preamble/style}
+\input{preamble/macros}
+\input{preamble/boxes}
+\input{preamble/code}
+
+\begin{document}
+
+\makelecturetitle
+
+\begin{objectives}
+After this lecture you should be able to:
+\begin{itemize}
+  \item state and apply the divide-and-conquer paradigm;
+  \item analyze recurrences using recursion trees and induction;
+  \item implement merge sort and Dijkstra's algorithm.
+\end{itemize}
+\end{objectives}
+
+\tableofcontents
+\bigskip
+
+\input{sections/01_introduction}
+\input{sections/02_math}
+\input{sections/03_algorithms}
+\input{sections/04_code}
+\input{sections/05_figures}
+\input{sections/06_exercises}
+\input{sections/07_reading}
+
+\end{document}
+

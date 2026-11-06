@@ -1,0 +1,23 @@
+% ---------------- Listings style ----------------
+\lstdefinestyle{modern}{
+  backgroundcolor=\color{codebg},
+  basicstyle=\ttfamily\small,
+  commentstyle=\itshape\color{codegray},
+  keywordstyle=\bfseries\color{codekw},
+  stringstyle=\color{codestr},
+  identifierstyle=\color{black},
+  numbers=left, numberstyle=\tiny\color{codegray}, numbersep=8pt,
+  frame=lines, rulecolor=\color{gray!40},
+  framexleftmargin=4pt, xleftmargin=14pt,
+  breaklines=true, breakatwhitespace=true,
+  postbreak=\mbox{\textcolor{codegray}{$\hookrightarrow$}\space},
+  showstringspaces=false, tabsize=4, captionpos=b,
+  aboveskip=10pt, belowskip=6pt
+}
+\lstset{style=modern}
+
+% ---------------- Algorithm style ----------------
+\algrenewcommand\algorithmicrequire{\textbf{Input:}}
+\algrenewcommand\algorithmicensure{\textbf{Output:}}
+\floatname{algorithm}{Algorithm}
+

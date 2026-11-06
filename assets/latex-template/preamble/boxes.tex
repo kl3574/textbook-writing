@@ -1,0 +1,36 @@
+% ---------------- Base style for all boxes ----------------
+\tcbset{
+  thmbase/.style={
+    enhanced, breakable, sharp corners, boxrule=0pt, frame hidden,
+    left=10pt, right=8pt, top=6pt, bottom=6pt,
+    fonttitle=\sffamily\bfseries, before skip=10pt, after skip=10pt
+  }
+}
+
+% ---------------- Numbered boxes ----------------
+% Usage: \begin{theorem}{Title}{label} ... \end{theorem}   ref: Theorem~\ref{thm:label}
+\newtcbtheorem[number within=section]{theorem}{Theorem}%
+  {thmbase, colback=accent!6, borderline west={3pt}{0pt}{accent}, coltitle=accent}{thm}
+\newtcbtheorem[use counter from=theorem]{lemma}{Lemma}%
+  {thmbase, colback=accent!6, borderline west={3pt}{0pt}{accent}, coltitle=accent}{lem}
+\newtcbtheorem[use counter from=theorem]{definition}{Definition}%
+  {thmbase, colback=accent3!7, borderline west={3pt}{0pt}{accent3}, coltitle=accent3}{def}
+\newtcbtheorem[use counter from=theorem]{example}{Example}%
+  {thmbase, colback=accent2!6, borderline west={3pt}{0pt}{accent2}, coltitle=accent2}{ex}
+\newtcbtheorem[number within=section]{exercise}{Exercise}%
+  {thmbase, colback=gray!8, borderline west={3pt}{0pt}{gray}, coltitle=black!70}{exc}
+
+% ---------------- Unnumbered boxes ----------------
+\newtcolorbox{keyidea}[1][Key Idea]{thmbase, colback=yellow!12,
+  borderline west={3pt}{0pt}{yellow!70!orange},
+  before upper={\textbf{\sffamily\color{yellow!40!black}#1.}\ }}
+\newtcolorbox{notebox}[1][Note]{thmbase, colback=gray!8,
+  borderline west={3pt}{0pt}{gray!70},
+  before upper={\textbf{\sffamily\color{black!70}#1.}\ }}
+\newtcolorbox{warnbox}[1][Warning]{thmbase, colback=red!6,
+  borderline west={3pt}{0pt}{red!70!black},
+  before upper={\textbf{\sffamily\color{red!70!black}#1.}\ }}
+\newtcolorbox{objectives}{thmbase, colback=accent!6,
+  borderline west={3pt}{0pt}{accent},
+  before upper={\textbf{\sffamily\color{accent}Learning objectives}\par\vspace{2pt}}}
+

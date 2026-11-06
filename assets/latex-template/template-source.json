@@ -1,0 +1,23 @@
+{
+  "source": "/home/lkx/textbook_template",
+  "captured_at": "2026-11-04T09:25:10.396136+00:00",
+  "files": {
+    "main.tex": "80600457492ab8d9044b7063d491ccd2de540bfeea71baab3c518d362f0a15c6",
+    "sections/02_math.tex": "b4dd389e06b7172d0c201e3702acf45441994b3f802cfe148dfc322f1320e493",
+    "sections/01_introduction.tex": "a63f2019f98d53cb051fd37ae1e0c674486a68840970afcb33e89a877901c55c",
+    "sections/07_reading.tex": "6c1eea587b88d364011f10fa73cb0491051fb762f75000b4ebfe5fd33ed65160",
+    "sections/06_exercises.tex": "23321dd16b1294b7f9dabe65c8496444f0fa1c7cc75317b4e24f986e2fb25bb3",
+    "sections/04_code.tex": "dd079ccb0b11d875feea5372e3d6bbd6469926001110e2417f7ab9f04e6ffeb8",
+    "sections/05_figures.tex": "f4d9a669066424331a12ca318eda6242841e1af6ab696f65e02531a0d34332ed",
+    "sections/03_algorithms.tex": "026c3a29eb7a1aec38bf1dfcb2deb16418b8e3088cfececd7a65a34af42e3164",
+    "code/merge_sort.py": "1b0b4aab152f774d1291f7b434458a4b903d9453e86b698ae6a78a21aca1094d",
+    "code/binary_search.cpp": "145bfae1883a27ca330b8ca89d464f0c5ac0ae06bf5ec19b14ee1a2baed8c9da",
+    "preamble/code.tex": "e728111fc7eb8d352d17a783a697a60d1eadcf47a30a696dcbe0784828a0b3bf",
+    "preamble/macros.tex": "f16ee045d4d2612722dd04db66557de0c9e968e52fa8b61d691907caed6dbbd3",
+    "preamble/packages.tex": "f5052a7933b29bc0c3d50e2b18c6143f818001a0a84c27b43bdf1f534c786baa",
+    "preamble/boxes.tex": "e9f1a768d081a356215d46424676c3d4e0856aad12e24e6daec90d1f8e5d8a75",
+    "preamble/style.tex": "91f9998d8f6d584884e27b19ce180c1ddd3bded1d30d5d0943f0694118c4c748",
+    "figures/graph.tex": "6606be72ad1094dad3c18bc2b2f8624b85e210cafed67836991a671b069a3fc4",
+    "figures/growth.tex": "0ae6b6076f872710ef283675c0e0d6182c6f82645433ad8e4917debe4bb6dec1"
+  }
+}

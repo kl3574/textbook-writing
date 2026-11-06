@@ -1,0 +1,27 @@
+\section{Algorithms}
+
+\begin{algorithm}[t]
+\caption{Dijkstra's shortest paths}\label{alg:dijkstra}
+\begin{algorithmic}[1]
+\Require Graph $G=(V,E)$, weights $w:E\to\R_{\ge 0}$, source $s\in V$
+\Ensure Shortest-path distances $d[v]$ from $s$ to every $v\in V$
+\State $d[v]\gets\infty$ for all $v\in V$; \ $d[s]\gets 0$
+\State $Q\gets$ priority queue containing all $v\in V$ keyed by $d[v]$
+\While{$Q\neq\emptyset$}
+  \State $u\gets$ \Call{ExtractMin}{$Q$}
+  \ForAll{edges $(u,v)\in E$}
+    \If{$d[u]+w(u,v)<d[v]$}
+      \State $d[v]\gets d[u]+w(u,v)$
+      \State \Call{DecreaseKey}{$Q,v,d[v]$}
+    \EndIf
+  \EndFor
+\EndWhile
+\State \Return $d$
+\end{algorithmic}
+\end{algorithm}
+
+\begin{lemma}{Correctness invariant}{inv}
+When a vertex $u$ is extracted from $Q$, $d[u]$ equals the true shortest-path
+distance $\delta(s,u)$.
+\end{lemma}
+

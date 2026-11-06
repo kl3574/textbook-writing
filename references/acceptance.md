@@ -1,8 +1,10 @@
 # TextbookReleaseManifest/v2：统一发布验收
 
-v3 的唯一发布入口是 `scripts/verify_release.py`。旧 TextbookAcceptanceManifest/v1 和旧 CLI 保留为局部迁移检查，不能替代新发布流程；原始 v2.2 检查器冻结在 legacy_contract.py，仅用于基线重放。
+v3 HTML 的唯一发布入口是 `scripts/verify_release.py`。旧 TextbookAcceptanceManifest/v1 和旧 CLI 保留为局部迁移检查，不能替代新发布流程；原始 v2.2 检查器冻结在 legacy_contract.py，仅用于基线重放。
 
-## 三个 profile
+原生 `latex-pdf` 不使用这个 HTML 清单或验收器；模板、编译和 PDF 验收见 [LaTeX 规范](latex-format.md)。HTML 下游投影仍须独立执行本合同。
+
+## 三个 HTML profile
 
 - authoring-master：稳定对象身份、公式注册表、任务和来源定位；不要求独立浏览器运行。
 - note-fragment：单一 `<div data-schema-version="9">`；被动元素/属性/URL 允许列表；不含脚本、样式、事件属性、活动 URL 或独立运行时。不是 Zotero 宿主的安全审计或写入授权。

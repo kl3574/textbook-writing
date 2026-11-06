@@ -1,0 +1,15 @@
+\begin{tikzpicture}
+\begin{axis}[
+  width=0.8\linewidth, height=6cm,
+  xlabel={$n$}, ylabel={operations},
+  xmin=1, xmax=20, ymin=0, ymax=200,
+  legend pos=north west, grid=major, grid style={gray!25},
+  every axis plot/.append style={thick}
+]
+  \addplot[accent,  domain=1:20, samples=40] {x};
+  \addplot[accent3, domain=1:20, samples=40] {x*ln(x)/ln(2)};
+  \addplot[accent2, domain=1:20, samples=40] {x^2/2};
+  \legend{$n$, $n\log_2 n$, $n^2/2$}
+\end{axis}
+\end{tikzpicture}
+

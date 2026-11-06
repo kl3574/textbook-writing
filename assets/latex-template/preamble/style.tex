@@ -1,0 +1,50 @@
+% ---------------- Colors (change the theme here) ----------------
+\definecolor{accent}{HTML}{1F5FBF}     % main accent (blue)
+\definecolor{accent2}{HTML}{C2410C}    % secondary accent (orange)
+\definecolor{accent3}{HTML}{15803D}    % tertiary accent (green)
+\definecolor{codebg}{HTML}{F6F8FA}
+\definecolor{codegray}{HTML}{6A737D}
+\definecolor{codekw}{HTML}{CF222E}
+\definecolor{codestr}{HTML}{0A3069}
+\definecolor{codefn}{HTML}{8250DF}
+
+% ---------------- Section headings ----------------
+\titleformat{\section}{\Large\sffamily\bfseries\color{accent}}{\thesection}{0.7em}{}
+\titleformat{\subsection}{\large\sffamily\bfseries\color{black!80}}{\thesubsection}{0.7em}{}
+\titleformat{\subsubsection}{\normalsize\sffamily\bfseries\color{black!70}}{\thesubsubsection}{0.7em}{}
+\titlespacing*{\section}{0pt}{16pt}{8pt}
+
+% ---------------- Header / footer ----------------
+% \pagestyle{fancy}
+% \fancyhf{}
+% \fancyhead[L]{\sffamily\small\color{gray}\coursecode\ --- \coursename}
+% \fancyhead[R]{\sffamily\small\color{gray}Lecture \lecnumber: \lectitle}
+% \fancyfoot[C]{\sffamily\small\thepage}
+% \renewcommand{\headrulewidth}{0.4pt}
+% \renewcommand{\headrule}{\hbox to\headwidth{\color{gray!50}\leaders\hrule height \headrulewidth\hfill}}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\sffamily\small\color{gray}\coursecode\ --- \coursename}
+\fancyhead[R]{\sffamily\small\color{gray}Lecture \lecnumber: \lectitle}
+\fancyfoot[L]{\sffamily\small\color{gray}\lecturer\ $\cdot$ \semester}
+\fancyfoot[C]{\sffamily\small\color{gray}\coursecode}
+\fancyfoot[R]{\sffamily\small\color{gray}Page \thepage\ of \pageref{LastPage}}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+\renewcommand{\headrule}{\hbox to\headwidth{\color{gray!50}\leaders\hrule height \headrulewidth\hfill}}
+\renewcommand{\footrule}{\hbox to\headwidth{\color{gray!50}\leaders\hrule height \footrulewidth\hfill}}
+
+% ---------------- Title block ----------------
+\newcommand{\makelecturetitle}{%
+  \begin{tcolorbox}[enhanced, colback=accent, colframe=accent, coltext=white,
+    sharp corners, boxrule=0pt, left=14pt, right=14pt, top=12pt, bottom=12pt,
+    overlay={\fill[white,opacity=0.08] (frame.south east) circle (2.2cm);}]
+    {\sffamily\small\textbf{\coursecode}\ $\cdot$\ \coursename\hfill \semester\par}
+    \vspace{6pt}
+    {\sffamily\bfseries\huge Lecture \lecnumber: \lectitle\par}
+    \vspace{6pt}
+    {\sffamily\small Lecturer: \lecturer\hfill Compiled: \today\par}
+  \end{tcolorbox}
+  \vspace{6pt}
+}
+

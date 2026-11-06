@@ -1,0 +1,53 @@
+\section{Mathematical Foundations}\label{sec:math}
+
+\begin{definition}{Big-O notation}{bigo}
+Let $f,g:\N\to\R_{\ge 0}$. We write $f(n)=\O(g(n))$ if there exist $c>0$ and
+$n_0\in\N$ such that $f(n)\le c\,g(n)$ for all $n\ge n_0$.
+\end{definition}
+
+\begin{theorem}{Merge sort recurrence}{mergesort}
+Let $T(n)=2T(n/2)+n$ with $T(1)=1$ for $n$ a power of two. Then
+$T(n)=n\log_2 n + n=\Theta(n\log n)$.
+\end{theorem}
+
+\begin{proof}
+We argue by induction on $k$ where $n=2^k$. For $k=0$, $T(1)=1=1\cdot 0+1$.
+Assume the claim for $n/2$. Then
+\begin{align}
+T(n) &= 2\,T(n/2) + n \notag\\
+     &= 2\left(\tfrac{n}{2}\log_2\tfrac{n}{2} + \tfrac{n}{2}\right) + n \notag\\
+     &= n(\log_2 n - 1) + n + n \notag\\
+     &= n\log_2 n + n. \qedhere
+\end{align}
+\end{proof}
+
+\begin{example}{Gradient descent step}{gd}
+For a differentiable $f:\R^d\to\R$ the update with step size $\eta>0$ is
+\[
+  \bm{x}_{t+1} = \bm{x}_t - \eta\,\nabla f(\bm{x}_t),
+  \qquad
+  \bm{x}^\star \in \argmin_{\bm{x}} f(\bm{x}).
+\]
+\end{example}
+
+\begin{notebox}[Note]
+Use \texttt{\textbackslash begin\{theorem\}\{Title\}\{label\}} and refer to it
+with \texttt{Theorem~\textbackslash ref\{thm:label\}}. For instance,
+Theorem~\ref{thm:mergesort} above.
+\end{notebox}
+
+A small table with \texttt{booktabs}:
+\begin{table}[h]
+\centering
+\caption{Common running times.}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Algorithm} & \textbf{Time} & \textbf{Space} \\
+\midrule
+Merge sort      & $\O(n\log n)$     & $\O(n)$ \\
+Quicksort (avg) & $\O(n\log n)$     & $\O(\log n)$ \\
+Dijkstra (heap) & $\O((V+E)\log V)$ & $\O(V)$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+

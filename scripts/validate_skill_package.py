@@ -9,6 +9,8 @@ import re
 
 REQUIRED=("references/authoring.md","references/content-and-review.md","references/acceptance.md","references/evaluation.md","scripts/verify_release.py","scripts/release_contract.py","scripts/browser_checks.py","scripts/content_tools.py","scripts/behavior_eval.py","scripts/check_textbook_contract.py","scripts/browser_acceptance.py","tests/test_textbook_contract.py","tests/test_release_v3.py","evals/behavior_cases.json","examples/gls/build.py","requirements.txt","VERSION")
 
+REQUIRED += ("references/latex-format.md", "scripts/init_latex_project.py", "tests/test_latex_project.py", "assets/latex-template/main.tex", "assets/latex-template/template-source.json")
+
 
 def main():
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('root',nargs='?',type=Path,default=Path.cwd());a=p.parse_args();root=a.root.resolve();errors=[]
@@ -27,6 +29,17 @@ def main():
     for relative,expected in [('scripts/legacy_contract.py','bbd4cf8a223b98887def13dd1f21ab9781ee8658'),('scripts/legacy_browser.py','04c02a387edd35535d0b25e651819462118cc45b')]:
         b=(root/relative).read_bytes();actual=hashlib.sha1(b'blob '+str(len(b)).encode()+b'\0'+b).hexdigest()
         if actual!=expected:errors.append('frozen baseline changed: '+relative)
+    try:
+        template = root / 'assets/latex-template'
+        manifest = json.loads((template / 'template-source.json').read_text())
+        for relative, expected in manifest['files'].items():
+            path = template / relative
+            if path.is_symlink() or not path.resolve().is_relative_to(template.resolve()):
+                errors.append('unsafe template path: ' + relative)
+            elif hashlib.sha256(path.read_bytes()).hexdigest() != expected:
+                errors.append('template hash mismatch: ' + relative)
+    except (OSError, ValueError, KeyError, TypeError) as exc:
+        errors.append('bundled template invalid: ' + str(exc))
     print(json.dumps({'status':'FAIL' if errors else 'PASS','version':version,'errors':errors},ensure_ascii=False))
     return 1 if errors else 0
 

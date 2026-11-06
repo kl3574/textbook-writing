@@ -1,5 +1,7 @@
 # 内容对象、修改影响与独立评审
 
+以下 DOM 注册、投影脚本与 `html_sha256` 回执仅适用于 HTML。TeX/PDF 保留相同的定理—证明—来源—题解关系与独立审查要求，以源码文件/标签和实际输入/PDF 摘要定位；依 [LaTeX 规范](latex-format.md) 另存检查证据。学习者 TeX/PDF 副本也必须实际移除测试答案，并检查源码附件与生成 PDF；不能仅隐藏答案或用 HTML 投影脚本处理 TeX。
+
 ## 内容注册表 TextbookContent/v1
 
 JSON 根包含 `schema`、`objects`、`sources`。所有 `[data-object-type]` HTML 节点都须有唯一 `id`，并与 objects 一一对应。对象的 `content_sha256` 是 `BeautifulSoup(..., 'html.parser')` 解析后 `str(node)` 的 UTF-8 SHA-256；构建与验收使用同一固定解析器版本。哈希只绑定内容，不证明内容正确。

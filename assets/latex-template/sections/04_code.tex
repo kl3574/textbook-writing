@@ -1,0 +1,17 @@
+\section{Code}
+
+% Source files live in code/ -- edit them there and they update here.
+\lstinputlisting[language=Python, caption={Merge sort in Python.}, label={lst:merge}]{code/merge_sort.py}
+
+\lstinputlisting[language=C++, caption={Binary search in C++.}, label={lst:bsearch}]{code/binary_search.cpp}
+
+% Short snippets can also be written inline:
+% \begin{lstlisting}[language=Python, caption={...}, label={lst:x}]
+% print("hello")
+% \end{lstlisting}
+
+\begin{warnbox}[Pitfall]
+Writing \code{(lo + hi) / 2} can overflow for large indices; use
+\code{lo + (hi - lo) / 2} as in Listing~\ref{lst:bsearch}.
+\end{warnbox}
+

@@ -1,0 +1,15 @@
+\begin{tikzpicture}[
+  >=Stealth, thick,
+  v/.style={circle, draw=accent, fill=accent!10, minimum size=8mm, font=\sffamily}
+]
+  \node[v] (s) at (0,0)     {$s$};
+  \node[v] (a) at (2.5,1.4) {$a$};
+  \node[v] (b) at (2.5,-1.4){$b$};
+  \node[v] (t) at (5,0)     {$t$};
+  \draw[->] (s) -- node[above left]  {\small 4} (a);
+  \draw[->] (s) -- node[below left]  {\small 2} (b);
+  \draw[->] (a) -- node[above right] {\small 3} (t);
+  \draw[->] (b) -- node[below right] {\small 6} (t);
+  \draw[->] (b) -- node[right]       {\small 1} (a);
+\end{tikzpicture}
+
